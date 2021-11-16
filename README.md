@@ -1,5 +1,10 @@
 # 实仁·排盘
 
+## 安装
+```bash
+yarn add shiren-columns
+npm i shiren-columns
+```
 
 ## 索引转文字
 ```js
