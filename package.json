@@ -1,0 +1,35 @@
+{
+  "name": "shiren-columns",
+  "version": "0.1.0",
+  "description": "实仁排盘四柱、大运、流年",
+  "keywords": [
+    "八字",
+    "排盘",
+    "四柱",
+    "大运",
+    "流年"
+  ],
+  "main": "index.js",
+  "repository": {
+    "url": "https://github.com/10in-tech/shiren-columns",
+    "type": "git"
+  },
+  "author": "shiyin <developer@10in.com>",
+  "contributors": [
+    "soonio <soonio@qq.com> (https://github.com/soonio)"
+  ],
+  "bugs": {
+    "email": "developer@10in.com",
+    "url": "https://github.com/10in-tech/shiren-columns/issues"
+  },
+  "type": "module",
+  "files": [
+    "index.js",
+    "algorithm.js",
+    "definition.js"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "shiren-calendar": "^0.3.1"
+  }
+}
