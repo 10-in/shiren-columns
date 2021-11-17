@@ -31,11 +31,11 @@ const info = plate(false, 1989, 11, 6, 18)
 // 获取日干
 const dg = info.basic.g[2]
 
-// 把四柱天干｜地址索引转换为对应的天干颜色
+// 把四柱天干｜地支索引转换为对应的天干颜色
 info.basic.g = Builder.g(dg, info.basic.g)
 info.basic.z = Builder.z(dg, info.basic.z)
 
-// 把大运的天干｜地址索引转换为对应的天干颜色
+// 把大运的天干｜地支索引转换为对应的天干颜色
 info.lucky.g = Builder.g(dg, info.lucky.g)
 info.lucky.z = Builder.z(dg, info.lucky.z)
 
