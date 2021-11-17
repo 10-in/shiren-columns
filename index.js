@@ -48,60 +48,88 @@ export class Str {
     }
 }
 
+function tranG(v, dg, dge) {
+    let e = g2e(v)
+    let color = EColor[e]
+    return {
+        name: Str.g(v),
+        color: color,
+        element: [{name: Str.e(e), color: color}],
+        spirit: [{name: Str.spirits10(2 * spirit(dge, e) + (v % 2 === dg % 2)), color: color}]
+    }
+}
+
+function tranZ(v, dg, dge) {
+    let e = z2e(v)
+    let color = EColor[e]
+    const config = {
+        name: Str.z(v),
+        color: color,
+        g: [],
+        element: [],
+        spirit: []
+    }
+    ZwG[v].map((i) => {
+        let e = g2e(i)
+        let color = EColor[e]
+        config.g.push({
+            name: Str.g(i),
+            color: color
+        })
+        config.element.push({
+            name: Str.e(e),
+            color: color
+        })
+        config.spirit.push({
+            name: Str.spirits10(2 * spirit(dge, e) + (i % 2 === dg % 2)),
+            color: color
+        })
+    })
+    return config;
+}
+
 // 构造器
 export class Builder {
-    // 构造天干信息
-    static g(is)  {
-        const dg = is[2]
+    /**
+     * 构造天干信息
+     * @param dg 日干索引
+     * @param is 天干索引列表
+     * @returns {*}
+     */
+    static g(dg, is)  {
         const dge = g2e(dg)
-        return is.map((v) => {
-            let e = g2e(v)
-            let color = EColor[e]
-            return {
-                name: Str.g(v),
-                color: color,
-                element: [{name: Str.e(e), color: color}],
-                spirit: [{name: Str.spirits10(2 * spirit(dge, e) + (v % 2 === dg % 2)), color: color}]
-            }
-        })
-    }
-    // 构造地址信息
-    static z(is, dg)  {
-        const dge = g2e(dg)
-        return is.map((v) => {
-            let e = z2e(v)
-            let color = EColor[e]
-            const config = {
-                name: Str.z(v),
-                color: color,
-                g: [],
-                element: [],
-                spirit: []
-            }
-            ZwG[v].map((i) => {
-                let e = g2e(i)
-                let color = EColor[e]
-                config.g.push({
-                    name: Str.g(i),
-                    color: color
-                })
-                config.element.push({
-                    name: Str.e(e),
-                    color: color
-                })
-                config.spirit.push({
-                    name: Str.spirits10(2 * spirit(dge, e) + (i % 2 === dg % 2)),
-                    color: color
-                })
-            })
-            return config;
-        })
+        return is.map((v) => { return tranG(v, dg, dge)})
     }
 
     /**
-     * 流年
-     * @param year
-     * @param size
+     * 构造地址信息
+     * @param dg 日干索引
+     * @param is 天干索引列表
+     * @returns {*}
+     */
+    static z(dg, is)  {
+        const dge = g2e(dg)
+        return is.map((v) => { return tranZ(v, dg, dge) })
+    }
+
+    /**
+     * 构造天干和地址(一柱)
+     * @param dg 日干索引
+     * @param gz 干支
+     * @returns {*&{g: {color: string, name: string, spirit: [{color: string, name: string}], element: [{color: string, name: string}]}, z: {color: string, g: *[], name: string, spirit: *[], element: *[]}}}
+     */
+    static gz(dg, gz) {
+        const dge = g2e(dg)
+        return {...gz,
+            g: tranG(gz.g, dg, dge),
+            z: tranZ(gz.z, dg, dge)
+        }
+    }
+
+    /**
+     * 流年(点击大运需要展开的数据)
+     * @param year 年
+     * @param size 获取的条目书，如1990年开始往后十年(1990～1999),就是10
      * @returns {*[]}
      */
     static year(year, size=10) {
@@ -117,22 +145,30 @@ export class Builder {
             z = nextZ(z)
             i++
         } while (i<size)
-
         return columns
     }
 
     /**
-     * 流月
-     * @param year
+     * 流月(点击流年时需要展开的数据)
+     * @param year 年
      * @returns {{g: *, z: *, tip: string}[]}
      */
     static month(year) {
         const si = yearJieQi(year)
-        const gzd = gzi(si[0].year, si[0].month, si[0].day, 0)
+        console.log(si[0])
+        const gzd = gzi(si[0].year, si[0].month, si[0].day, si[0].hour, si[0].minute, si[0].second)
+        console.log(si[0].year, si[0].month, si[0].day, 1)
+        console.log(gzd)
         let g = gzd.g[1]
         let z = gzd.z[1]
         return si.map((v, index) => {
-          let d = {g: g, z: z, tip: v.month + '月' + SolarIterm[index], dd: v.dd}
+          let d = {
+              g: g,
+              z: z,
+              tip: v.month + '月' + SolarIterm[index],
+              day: v.day,
+              dd: v.dd
+          }
           g = nextG(g)
           z = nextZ(z)
           return d
@@ -140,11 +176,11 @@ export class Builder {
     }
 
     /**
-     * 流日
-     * @param year
-     * @param month
-     * @param startDay
-     * @param delimiterDay
+     * 流日(点击流月需要展开的数据)
+     * @param year 年
+     * @param month 月份
+     * @param startDay 月份对应的12节气的开始日期
+     * @param delimiterDay 下一个月份对应的12节气开始日期
      * @returns {*[]}
      */
     static day(year, month, startDay, delimiterDay) {
@@ -175,6 +211,12 @@ export class Builder {
         }
         return columns
     }
+
+    /**
+     * 起始的子时对应的时干
+     * @param hourG
+     * @returns {*[]}
+     */
     static hour(hourG) {
         let start = -1;
         let z = 0
