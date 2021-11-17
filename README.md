@@ -22,7 +22,7 @@ console.log(Str.spirits10(0, 1)) // 印卩
 ```js
 "use strict";
 
-import {Builder} from "./index.js";
+import {Builder} from "shiren-columns";
 import {plate} from "shiren-calendar";
 
 // 获取基础的排盘信息
