@@ -5,7 +5,7 @@
 // 获取排盘基本信息
 
 import {EColor, Element, Gan, Opposite, SolarIterm, Spirits10, Spirits5, Zhi, ZwG} from "./definition.js";
-import {g2e, nextG, nextZ, spirit, z2e} from "./algorithm.js";
+import {g2e, nextG, nextZ, spirit, year2month, z2e} from "./algorithm.js";
 import {gzi, lunar2solar, solarMonthHasDays, yearJieQi} from "shiren-calendar";
 
 // 索引转文字
@@ -155,25 +155,9 @@ export class Builder {
      */
     static month(year) {
         const si = yearJieQi(year)
-
-        // 立春的那一秒可能计算出来的干支有差异，导致计算错误，需要向后偏移一秒
-        const spring = si[0]
-        if (spring.second + 1 < 60) {
-            spring.second += 1
-        } else {
-            if (spring.minute + 1 < 60) {
-                spring.minute += 1
-                spring.second = 0
-            } else {
-                spring.hour += 1
-                spring.minute = 0
-                spring.second = 0
-            }
-        }
-
-        const gzd = gzi(spring.year, spring.month, spring.day, spring.hour, spring.minute, spring.second)
-        let g = gzd.g[1]
-        let z = gzd.z[1]
+        // 优化为年上起月法
+        let g = year2month(((year + 4712 + 24) % 60 + 60) % 60 % 10)
+        let z = 2
         return si.map((v, index) => {
           let d = {
               g: g,
