@@ -128,7 +128,7 @@ export class Builder {
 
     /**
      * 流年(点击大运需要展开的数据)
-     * @param year 年
+     * @param year 年 (特别注意，公元前的年计算会偏差一年，因为没有公元0年)
      * @param size 获取的条目书，如1990年开始往后十年(1990～1999),就是10
      * @returns {*[]}
      */
