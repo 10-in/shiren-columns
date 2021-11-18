@@ -1,6 +1,6 @@
 {
   "name": "shiren-columns",
-  "version": "0.2.0",
+  "version": "0.3.3",
   "description": "实仁排盘四柱、大运、流年",
   "keywords": [
     "八字",
@@ -30,6 +30,6 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "shiren-calendar": "^0.3.2"
+    "shiren-calendar": "^0.3.4"
   }
 }

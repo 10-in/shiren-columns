@@ -136,7 +136,7 @@ export class Builder {
         const yearGZ = ((year + 4712 + 24) % 60 + 60) % 60;
         const columns = []
         let g = yearGZ % 10
-        let z = yearGZ % 10
+        let z = yearGZ % 12
 
         let i = 0
         do {
