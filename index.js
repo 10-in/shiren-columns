@@ -155,10 +155,23 @@ export class Builder {
      */
     static month(year) {
         const si = yearJieQi(year)
-        console.log(si[0])
-        const gzd = gzi(si[0].year, si[0].month, si[0].day, si[0].hour, si[0].minute, si[0].second)
-        console.log(si[0].year, si[0].month, si[0].day, 1)
-        console.log(gzd)
+
+        // 立春的那一秒可能计算出来的干支有差异，导致计算错误，需要向后偏移一秒
+        const spring = si[0]
+        if (spring.second + 1 < 60) {
+            spring.second += 1
+        } else {
+            if (spring.minute + 1 < 60) {
+                spring.minute += 1
+                spring.second = 0
+            } else {
+                spring.hour += 1
+                spring.minute = 0
+                spring.second = 0
+            }
+        }
+
+        const gzd = gzi(spring.year, spring.month, spring.day, spring.hour, spring.minute, spring.second)
         let g = gzd.g[1]
         let z = gzd.z[1]
         return si.map((v, index) => {
