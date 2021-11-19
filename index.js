@@ -12,36 +12,43 @@ import {gzi, solarMonthHasDays, yearJieQi} from "shiren-calendar";
 export class Str {
     /**
      * @returns string
-     * @param arg 阴阳
+     * @param arg 阴阳索引
      */
     static o(...arg) {return this.stringify(arg, Opposite)}
     /**
      * @returns string
-     * @param arg 五行
+     * @param arg 五行索引
      */
     static e(...arg) {return this.stringify(arg, Element)}
     /**
      * @returns string
-     * @param arg 天干
+     * @param arg 天干索引
      */
     static g(...arg) {return this.stringify(arg, Gan)}
     /**
      * @returns string
-     * @param arg 地址
+     * @param arg 地址索引
      */
     static z(...arg) {return this.stringify(arg, Zhi)}
     /**
      * @returns string
-     * @param arg 五神
+     * @param arg 五神索引
      */
     static spirits(...arg) {return this.stringify(arg, Spirits5)}
 
     /**
      * @returns string
-     * @param arg 十神
+     * @param arg 十神索引
      */
     static spirits10(...arg) {return this.stringify(arg, Spirits10)}
 
+    /**
+     * 把参数列表通过map转化成对应的字，并用分界符连接起来
+     * @param ps 参数列表
+     * @param map
+     * @param delimiter 分界符
+     * @returns {*}
+     */
     static stringify(ps = [], map = [], delimiter = '') {
         ps[0] = map[ps[0]]
         return ps.reduce((p, c) => {return `${p}${delimiter}${map[c]}`})
