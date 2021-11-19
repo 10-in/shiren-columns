@@ -6,48 +6,62 @@
 
 import {EColor, Element, Gan, Opposite, SolarIterm, Spirits10, Spirits5, Zhi, ZwG} from "./definition.js";
 import {g2e, nextG, nextZ, spirit, year2month, z2e} from "./algorithm.js";
-import {gzi, lunar2solar, solarMonthHasDays, yearJieQi} from "shiren-calendar";
+import {gzi, solarMonthHasDays, yearJieQi} from "shiren-calendar";
 
 // 索引转文字
 export class Str {
     /**
      * @returns string
-     * @param arg 阴阳
+     * @param arg 阴阳索引
      */
     static o(...arg) {return this.stringify(arg, Opposite)}
     /**
      * @returns string
-     * @param arg 五行
+     * @param arg 五行索引
      */
     static e(...arg) {return this.stringify(arg, Element)}
     /**
      * @returns string
-     * @param arg 天干
+     * @param arg 天干索引
      */
     static g(...arg) {return this.stringify(arg, Gan)}
     /**
      * @returns string
-     * @param arg 地址
+     * @param arg 地址索引
      */
     static z(...arg) {return this.stringify(arg, Zhi)}
     /**
      * @returns string
-     * @param arg 五神
+     * @param arg 五神索引
      */
     static spirits(...arg) {return this.stringify(arg, Spirits5)}
 
     /**
      * @returns string
-     * @param arg 十神
+     * @param arg 十神索引
      */
     static spirits10(...arg) {return this.stringify(arg, Spirits10)}
 
+    /**
+     * 把参数列表通过map转化成对应的字，并用分界符连接起来
+     * @param ps 参数列表
+     * @param map
+     * @param delimiter 分界符
+     * @returns {*}
+     */
     static stringify(ps = [], map = [], delimiter = '') {
         ps[0] = map[ps[0]]
         return ps.reduce((p, c) => {return `${p}${delimiter}${map[c]}`})
     }
 }
 
+/**
+ * 比较其他天干与日干的关系，得出其他天干的中文名称，颜色，五行，十神
+ * @param v 当前天干的索引
+ * @param dg 日干的索引索引
+ * @param dge 日干五行的索引
+ * @returns {{color: string, name: string, spirit: [{color: string, name: string}], element: [{color: string, name: string}]}}
+ */
 function tranG(v, dg, dge) {
     let e = g2e(v)
     let color = EColor[e]
@@ -59,6 +73,13 @@ function tranG(v, dg, dge) {
     }
 }
 
+/**
+ * 比较其他地支与日干的关系，得出其他地支的中文名称，颜色，五行，十神、藏干
+ * @param v
+ * @param dg
+ * @param dge
+ * @returns {{color: string, g: *[], name: string, spirit: *[], element: *[]}}
+ */
 function tranZ(v, dg, dge) {
     let e = z2e(v)
     let color = EColor[e]
@@ -72,18 +93,9 @@ function tranZ(v, dg, dge) {
     ZwG[v].map((i) => {
         let e = g2e(i)
         let color = EColor[e]
-        config.g.push({
-            name: Str.g(i),
-            color: color
-        })
-        config.element.push({
-            name: Str.e(e),
-            color: color
-        })
-        config.spirit.push({
-            name: Str.spirits10(2 * spirit(dge, e) + (i % 2 === dg % 2)),
-            color: color
-        })
+        config.g.push({name: Str.g(i), color: color})
+        config.element.push({name: Str.e(e), color: color})
+        config.spirit.push({name: Str.spirits10(2 * spirit(dge, e) + (i % 2 === dg % 2)), color: color})
     })
     return config;
 }
