@@ -283,6 +283,16 @@ export function day2hour(dayGan)
 }
 
 /**
+ * 天干地址索引转为60甲子索引
+ * @param g 天干索引
+ * @param z 地址索引
+ * @returns Number
+ */
+export function gz2ci(g, z) {
+    return 5 * ((g + 12 - z) % 12) + g
+}
+
+/**
  * 环形偏移下一个
  * @param current 当前
  * @param size 环形内数值个数
