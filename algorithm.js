@@ -265,7 +265,7 @@ export function prevZ(i)
 /**
  * 年上起月法
  * @param yearGan 年干
- * @return int 月干(月支都从寅开始)
+ * @return int  月干起点(月支都从寅开始)
  */
 export function year2month(yearGan)
 {
