@@ -48,7 +48,7 @@ const months = Builder.month(1990).map((item) => { return Builder.gz(dg, item) }
 console.log(months)
 
 // 获取流日 2月对应的索引为0，3-1..
-const days = Builder.day(1990, 2, months[0].day,months[0].dd).map((item) => { return Builder.gz(dg, item) })
+const days = Builder.day(1990, months[0].month, months[0].day, months[0].dm, months[0].dd).map((item) => { return Builder.gz(dg, item) })
 console.log(days)
 
 // 获取流时
@@ -80,6 +80,10 @@ console.log(hours)
     | :--: | :--: | :--: | :--: | ---- |
     |  戊  |  丁  |  丙  |  乙  | ···  |
     |  戌  |  酉  |  申  |  未  | ···  |
+
+  起运时间计算：公历A转为农历B，农历B年份加上起运年龄，月、天不变，则新的农历B1日期时间则为起运日期，如果B1对应的公历A1不存在，则进行闰月和减一天的操作，让A1存在
+
+  如 男生于1982-1-26 11:00:00，转为农历为1982年农历正月初二；根据男女顺逆，求出距离的节气的天数为20.45天，四舍五入为20除3取整为6，则六岁起运。起运日期则为1988年正月初二，转为公历为1989年2月7日
 
 - 流年
   流年当年对应的年份所对应的干支。如2021年对应辛丑年。  
