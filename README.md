@@ -48,7 +48,7 @@ const months = Builder.month(1990).map((item) => { return Builder.gz(dg, item) }
 console.log(months)
 
 // 获取流日 2月对应的索引为0，3-1..
-const days = Builder.day(1990, 2, months[0].day,months[0].dd).map((item) => { return Builder.gz(dg, item) })
+const days = Builder.day(1990, months[0].month, months[0].day, months[0].dm, months[0].dd).map((item) => { return Builder.gz(dg, item) })
 console.log(days)
 
 // 获取流时

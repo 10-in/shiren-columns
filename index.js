@@ -175,7 +175,9 @@ export class Builder {
               g: g,
               z: z,
               tip: v.month + '月' + SolarIterm[index],
+              month: v.month,
               day: v.day,
+              dm: v.dm,
               dd: v.dd
           }
           g = nextG(g)
@@ -189,36 +191,61 @@ export class Builder {
      * @param year 年
      * @param month 月份
      * @param startDay 月份对应的12节气的开始日期
+     * @param distanceMonth 起止日期对应的月份
      * @param delimiterDay 下一个月份对应的12节气开始日期
      * @returns {*[]}
      */
-    static day(year, month, startDay, delimiterDay) {
-        let dayN = solarMonthHasDays(year, month)
-
+    static day(year, month, startDay, distanceMonth, delimiterDay) {
         const gzd = gzi(year, month, startDay, 0)
         let dayG = gzd.g[2]
         let dayZ = gzd.z[2]
         let hourG = gzd.g[3]
 
         const columns = []
-        let nextStartDay = startDay - dayN;
-        while (startDay < dayN || nextStartDay < delimiterDay) {
-            let m, d
-            if (nextStartDay > 0) {
-                m = (month + 1) % 13
-                d = nextStartDay
-            } else {
-                d = startDay
-                m = month
+        if (distanceMonth > 0) { // 节气跨月了(跨了1个和2个)
+
+            // 计算当前月(月头节气到月尾)
+            let dayN = solarMonthHasDays(year, month)
+            Builder.buildColumns(columns, month, startDay, dayN + 1, dayG, dayZ, hourG)
+
+            let last = columns[columns.length - 1]
+            dayG = nextG(last.g)
+            dayZ = nextZ(last.z)
+            hourG = nextG(last.hourG)
+
+            if (distanceMonth > 1) { // 计算中间月，如节气在一三月，需要而外计算二月份
+                startDay = 1
+                if (month === 12) {
+                    year++
+                    month = 1
+                } else {
+                    month++
+                }
+                let dayNM = solarMonthHasDays(year, month)
+
+                Builder.buildColumns(columns, month, startDay, dayNM + 1, dayG, dayZ, hourG)
             }
-            columns.push({tips: m + '月' + d + '日', g: dayG, z: dayZ, hourG: hourG})
+
+            // 计算最后一个月(月头一日到月尾)
+            startDay = 1
+            month = (month + 1) % 13
+            Builder.buildColumns(columns, month, startDay, delimiterDay, dayG, dayZ, hourG)
+
+        } else {
+            Builder.buildColumns(columns, month, startDay, delimiterDay, dayG, dayZ, hourG)
+        }
+        return columns
+    }
+
+    // 私有方法
+    static buildColumns(columns, month, startDay, endDay, dayG, dayZ, hourG) {
+        while (startDay < endDay) {
+            columns.push({tips: month + '月' + startDay + '日', g: dayG, z: dayZ, hourG: hourG})
             dayG = nextG(dayG)
             dayZ = nextZ(dayZ)
             hourG = (hourG + 12) % 10
             startDay++
-            nextStartDay++
         }
-        return columns
     }
 
     /**
