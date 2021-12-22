@@ -228,7 +228,7 @@ export class Builder {
 
             // 计算最后一个月(月头一日到月尾)
             startDay = 1
-            month = (month + 1) % 13
+            month = month % 12 + 1
             Builder.buildColumns(columns, month, startDay, delimiterDay, dayG, dayZ, hourG)
 
         } else {
