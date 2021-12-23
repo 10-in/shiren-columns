@@ -323,7 +323,11 @@ export class Cutter {
     }
 
     static month(year, months, start, end) {
-        if (start[0] - year === 1) { // 相邻的两年
+        const startJD = solar2julian(...start)
+        const endJD = solar2julian(...end)
+        const interval = [VE(year), VE(year + 1)];
+
+        if (interval[0] < startJD && startJD < interval[1]) { // 开始时间在今年中
             let i = 0
             for (; i < months.length; i++) {
                 if (months[i].month === start[1]) {
@@ -333,7 +337,8 @@ export class Cutter {
             months = months.slice(i)
             months[0].day = start[2] // 把本月的配置直接进行切割
         }
-        if (end[0] - year === 0) {
+
+        if (interval[0] < endJD && endJD < interval[1]) { // 结束时间在今年中
             let j = 0
             for (; j < months.length; j++) {
                 if (months[j].month === end[1]) {
@@ -344,7 +349,6 @@ export class Cutter {
             const delimiterDay = julian2solar(solar2julian(...end) + 1)
             months[months.length - 1].dm = delimiterDay[1] - months[months.length - 1].month
             months[months.length - 1].dd = delimiterDay[2]
-
         }
         return months
     }
