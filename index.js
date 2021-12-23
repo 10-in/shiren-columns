@@ -6,7 +6,7 @@
 
 import {EColor, Element, Gan, Opposite, SolarIterm, Spirits10, Spirits5, Zhi, ZwG} from "./definition.js";
 import {g2e, nextG, nextZ, spirit, year2month, z2e} from "./algorithm.js";
-import {gzi, solarMonthHasDays, yearJieQi} from "shiren-calendar";
+import {gzi, julian2solar, solar2julian, solarMonthHasDays, VE, yearJieQi} from "shiren-calendar";
 
 // 索引转文字
 export class Str {
@@ -14,33 +14,49 @@ export class Str {
      * @returns string
      * @param arg 阴阳索引
      */
-    static o(...arg) {return this.stringify(arg, Opposite)}
+    static o(...arg) {
+        return this.stringify(arg, Opposite)
+    }
+
     /**
      * @returns string
      * @param arg 五行索引
      */
-    static e(...arg) {return this.stringify(arg, Element)}
+    static e(...arg) {
+        return this.stringify(arg, Element)
+    }
+
     /**
      * @returns string
      * @param arg 天干索引
      */
-    static g(...arg) {return this.stringify(arg, Gan)}
+    static g(...arg) {
+        return this.stringify(arg, Gan)
+    }
+
     /**
      * @returns string
      * @param arg 地址索引
      */
-    static z(...arg) {return this.stringify(arg, Zhi)}
+    static z(...arg) {
+        return this.stringify(arg, Zhi)
+    }
+
     /**
      * @returns string
      * @param arg 五神索引
      */
-    static spirits(...arg) {return this.stringify(arg, Spirits5)}
+    static spirits(...arg) {
+        return this.stringify(arg, Spirits5)
+    }
 
     /**
      * @returns string
      * @param arg 十神索引
      */
-    static spirits10(...arg) {return this.stringify(arg, Spirits10)}
+    static spirits10(...arg) {
+        return this.stringify(arg, Spirits10)
+    }
 
     /**
      * 把参数列表通过map转化成对应的字，并用分界符连接起来
@@ -51,7 +67,9 @@ export class Str {
      */
     static stringify(ps = [], map = [], delimiter = '') {
         ps[0] = map[ps[0]]
-        return ps.reduce((p, c) => {return `${p}${delimiter}${map[c]}`})
+        return ps.reduce((p, c) => {
+            return `${p}${delimiter}${map[c]}`
+        })
     }
 }
 
@@ -100,7 +118,7 @@ function tranZ(v, dg, dge) {
     return config;
 }
 
-// 构造器
+// 普通构造器
 export class Builder {
     /**
      * 构造天干信息
@@ -108,9 +126,11 @@ export class Builder {
      * @param is 天干索引列表
      * @returns {*}
      */
-    static g(dg, is)  {
+    static g(dg, is) {
         const dge = g2e(dg)
-        return is.map((v) => { return tranG(v, dg, dge)})
+        return is.map((v) => {
+            return tranG(v, dg, dge)
+        })
     }
 
     /**
@@ -119,9 +139,11 @@ export class Builder {
      * @param is 天干索引列表
      * @returns {*}
      */
-    static z(dg, is)  {
+    static z(dg, is) {
         const dge = g2e(dg)
-        return is.map((v) => { return tranZ(v, dg, dge) })
+        return is.map((v) => {
+            return tranZ(v, dg, dge)
+        })
     }
 
     /**
@@ -132,7 +154,8 @@ export class Builder {
      */
     static gz(dg, gz) {
         const dge = g2e(dg)
-        return {...gz,
+        return {
+            ...gz,
             g: tranG(gz.g, dg, dge),
             z: tranZ(gz.z, dg, dge)
         }
@@ -144,7 +167,7 @@ export class Builder {
      * @param size 获取的条目书，如1990年开始往后十年(1990～1999),就是10
      * @returns {*[]}
      */
-    static year(year, size=10) {
+    static year(year, size = 10) {
         const yearGZ = ((year + 4712 + 24) % 60 + 60) % 60;
         const columns = []
         let g = yearGZ % 10
@@ -156,7 +179,7 @@ export class Builder {
             g = nextG(g)
             z = nextZ(z)
             i++
-        } while (i<size)
+        } while (i < size)
         return columns
     }
 
@@ -171,18 +194,18 @@ export class Builder {
         let g = year2month(((year + 4712 + 24) % 60 + 60) % 60 % 10)
         let z = 2
         return si.map((v, index) => {
-          let d = {
-              g: g,
-              z: z,
-              tip: v.month + '月' + SolarIterm[index],
-              month: v.month,
-              day: v.day,
-              dm: v.dm,
-              dd: v.dd
-          }
-          g = nextG(g)
-          z = nextZ(z)
-          return d
+            let d = {
+                g: g,
+                z: z,
+                tip: v.month + '月' + SolarIterm[index],
+                month: v.month,
+                day: v.day,
+                dm: v.dm,
+                dd: v.dd
+            }
+            g = nextG(g)
+            z = nextZ(z)
+            return d
         })
     }
 
@@ -261,7 +284,7 @@ export class Builder {
             columns.push({
                 g: hourG,
                 z: z,
-                tips:  2 * start + 1 + '-' + (2 * (start + 1) + 1) + '时' ,
+                tips: 2 * start + 1 + '-' + (2 * (start + 1) + 1) + '时',
             })
             hourG = nextG(hourG)
             z = nextZ(z)
@@ -270,5 +293,59 @@ export class Builder {
         columns[0].tips = '0-1时'
         columns[12].tips = '23-24时'
         return columns
+    }
+}
+
+// 实仁排盘所需的切割器
+export class Cutter {
+    /**
+     * 流年(点击大运需要展开的数据)
+     * @param start 开始的年份数组
+     * @param end 结束的年份数组
+     * @returns {(*|number)[]} 第一个为开始年份，第二个参数为计算尺度
+     */
+    static yearRange(start, end) {
+        if (solar2julian(...start) < VE(start[0])) { // 当前开始时间在当年春分点之前，需要往前多显示一年
+            start[0] -= 1
+            if (start[0] === 0) { // 公元0年不存在，向前偏移到公元前1年
+                start[0] = -1
+            }
+        }
+        const endJd = solar2julian(...end)
+        if (endJd < VE(end[0])) { // 结束时间在今年春分点之前，则今年无需显示
+            end[0] -= 1
+        } else { // 如果在今年春分点以后，也有可能到下年
+            if (VE(end[0] + 1) < endJd) { // 结束时间 在下一年的春分点之后，需要往后多显示一年
+                end[0] += 1
+            }
+        }
+        return [start[0], end[0] - start[0] + 1]
+    }
+
+    static month(year, months, start, end) {
+        if (start[0] - year === 1) { // 相邻的两年
+            let i = 0
+            for (; i < months.length; i++) {
+                if (months[i].month === start[1]) {
+                    break
+                }
+            }
+            months = months.slice(i)
+            months[0].day = start[2] // 把本月的配置直接进行切割
+        }
+        if (end[0] - year === 0) {
+            let j = 0
+            for (; j < months.length; j++) {
+                if (months[j].month === end[1]) {
+                    break
+                }
+            }
+            months = months.slice(0, j + 1)
+            const delimiterDay = julian2solar(solar2julian(...end) + 1)
+            months[months.length - 1].dm = delimiterDay[1] - months[months.length - 1].month
+            months[months.length - 1].dd = delimiterDay[2]
+
+        }
+        return months
     }
 }

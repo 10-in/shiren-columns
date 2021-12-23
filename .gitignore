@@ -3,3 +3,4 @@ node_modules
 test.js
 yarn.lock
 yarn-error.log
+demo.js
