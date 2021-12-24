@@ -6,7 +6,14 @@
 
 import {EColor, Element, Gan, Opposite, SolarIterm, Spirits10, Spirits5, Zhi, ZwG} from "./definition.js";
 import {g2e, nextG, nextZ, spirit, year2month, z2e} from "./algorithm.js";
-import {gzi, julian2solar, solar2julian, solarMonthHasDays, VE, yearJieQi} from "shiren-calendar";
+import {
+    datetime2string,
+    gzi,
+    julian2solar,
+    solar2julian,
+    solarMonthHasDays, spring,
+    yearJieQi
+} from "shiren-calendar";
 
 // 索引转文字
 export class Str {
@@ -305,17 +312,18 @@ export class Cutter {
      * @returns {(*|number)[]} 第一个为开始年份，第二个参数为计算尺度
      */
     static yearRange(start, end) {
-        if (solar2julian(...start) < VE(start[0])) { // 当前开始时间在当年春分点之前，需要往前多显示一年
+        if (solar2julian(...start) < spring(start[0])) { // 当前开始时间在当年春分点之前，需要往前多显示一年
             start[0] -= 1
             if (start[0] === 0) { // 公元0年不存在，向前偏移到公元前1年
                 start[0] = -1
             }
         }
         const endJd = solar2julian(...end)
-        if (endJd < VE(end[0])) { // 结束时间在今年春分点之前，则今年无需显示
+
+        if (endJd < spring(end[0])) { // 结束时间在今年春分点之前，则今年无需显示
             end[0] -= 1
         } else { // 如果在今年春分点以后，也有可能到下年
-            if (VE(end[0] + 1) < endJd) { // 结束时间 在下一年的春分点之后，需要往后多显示一年
+            if (spring(end[0] + 1) < endJd) { // 结束时间 在下一年的春分点之后，需要往后多显示一年
                 end[0] += 1
             }
         }
@@ -325,7 +333,7 @@ export class Cutter {
     static month(year, months, start, end) {
         const startJD = solar2julian(...start)
         const endJD = solar2julian(...end)
-        const interval = [VE(year), VE(year + 1)];
+        const interval = [spring(year), spring(year + 1)];
 
         if (interval[0] < startJD && startJD < interval[1]) { // 开始时间在今年中
             let i = 0
