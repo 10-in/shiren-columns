@@ -346,8 +346,11 @@ export class Cutter {
                 }
             }
             i === months.length && (i = months.length - 1) // 偏移过度，矫正回来
-            months = months.slice(i)
-            months[0].day = start[2] // 把本月的配置直接进行切割
+            months = months.slice(i) // 切割月份
+
+            months[0].dm = months[0].dm - (start[1] - months[0].month)
+            months[0].day = start[2]
+            months[0].month = start[1]
         }
 
         if (interval[0] < endJD && endJD < interval[1]) { // 结束时间在今年
