@@ -355,8 +355,15 @@ export class Cutter {
             }
             months = months.slice(0, j + 1)
             const delimiterDay = julian2solar(solar2julian(...end) + 1)
-            months[months.length - 1].dm = delimiterDay[1] - months[months.length - 1].month
-            months[months.length - 1].dd = delimiterDay[2]
+            const li = months.length - 1
+
+            months[li].dm = delimiterDay[1] - months[li].month
+            months[li].dd = delimiterDay[2]
+
+            if (months[li].dm === 0 && months[li].day > months[li].dd) { // 最后一个月的开始时间在截止时间之后，需要删掉
+                months = months.slice(0, li)
+            }
+
         }
         return months
     }
