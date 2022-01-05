@@ -202,6 +202,7 @@ export class Builder {
         let z = 2
         return si.map((v, index) => {
             let d = {
+                jd: v.jd,
                 g: g,
                 z: z,
                 tip: v.month + '月' + SolarIterm[index],
@@ -312,22 +313,24 @@ export class Cutter {
      * @returns {(*|number)[]} 第一个为开始年份，第二个参数为计算尺度
      */
     static yearRange(start, end) {
+        let sy = start[0]
+        let ey = end[0]
         if (solar2julian(...start) < spring(start[0])) { // 当前开始时间在当年春分点之前，需要往前多显示一年
-            start[0] -= 1
-            if (start[0] === 0) { // 公元0年不存在，向前偏移到公元前1年
-                start[0] = -1
+            sy -= 1
+            if (sy === 0) { // 公元0年不存在，向前偏移到公元前1年
+                sy = -1
             }
         }
         const endJd = solar2julian(...end)
 
         if (endJd < spring(end[0])) { // 结束时间在今年春分点之前，则今年无需显示
-            end[0] -= 1
+            ey -= 1
         } else { // 如果在今年春分点以后，也有可能到下年
-            if (spring(end[0] + 1) < endJd) { // 结束时间 在下一年的春分点之后，需要往后多显示一年
-                end[0] += 1
+            if (spring(ey + 1) < endJd) { // 结束时间 在下一年的春分点之后，需要往后多显示一年
+                ey += 1
             }
         }
-        return [start[0], end[0] - start[0] + 1]
+        return [sy, ey - sy + 1]
     }
 
     static month(year, months, start, end) {
@@ -335,21 +338,22 @@ export class Cutter {
         const endJD = solar2julian(...end)
         const interval = [spring(year), spring(year + 1)];
 
-        if (interval[0] < startJD && startJD < interval[1]) { // 开始时间在今年中
+        if (interval[0] < startJD && startJD < interval[1]) { // 开始时间在今年
             let i = 0
             for (; i < months.length; i++) {
-                if (months[i].month === start[1]) {
+                if (months[i].jd > startJD) {
                     break
                 }
             }
+            i === months.length && (i = months.length - 1) // 偏移过度，矫正回来
             months = months.slice(i)
             months[0].day = start[2] // 把本月的配置直接进行切割
         }
 
-        if (interval[0] < endJD && endJD < interval[1]) { // 结束时间在今年中
+        if (interval[0] < endJD && endJD < interval[1]) { // 结束时间在今年
             let j = 0
             for (; j < months.length; j++) {
-                if (months[j].month === end[1]) {
+                if (months[j].jd > endJD) {
                     break
                 }
             }
