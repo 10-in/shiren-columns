@@ -365,7 +365,7 @@ export class Cutter {
                 }
             }
             months = months.slice(0, j)
-            const delimiterDay = julian2solar(solar2julian(...end))
+            const delimiterDay = julian2solar(solar2julian(...end) + 1)
             const li = months.length - 1
 
             months[li].dm = delimiterDay[1] - months[li].month
