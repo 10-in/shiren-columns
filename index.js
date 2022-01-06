@@ -203,8 +203,8 @@ export class Builder {
         return si.map((v, index) => {
             let d = {
                 start: v.jd,
-                end: v.nextjd,
-                // range: datetime2string(julian2solar(v.jd)) + "~" + datetime2string(julian2solar(v.nextjd)),
+                end: v.nextjd - 1,
+                // range: datetime2string(julian2solar(v.jd)) + "~" + datetime2string(julian2solar(v.nextjd - 1)),
                 g: g,
                 z: z,
                 tip: v.month + '月' + SolarIterm[index],
@@ -309,7 +309,6 @@ export class Cutter {
      * @returns {*}
      */
     static month(months, start, end) {
-        // console.log(start, end)
         const startJD = solar2julian(...start)
         const endJD = solar2julian(...end)
         const interval = [months[0].start, months[months.length - 1].end]
