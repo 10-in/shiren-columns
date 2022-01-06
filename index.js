@@ -222,7 +222,7 @@ export class Builder {
      * @returns {*[]}
      */
     static day(month) {
-        let startJD = month.start
+        let startJD = Math.floor(month.start) - 0.5
         const columns = []
 
         const firstDay = julian2solar(startJD)
