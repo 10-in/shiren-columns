@@ -326,13 +326,16 @@ export class Cutter {
             })
         }
 
-
         if (interval[0] < endJD && endJD < interval[1]) { // 结束时间在今年
             months = months.filter((v) => {
                 if (v.end < endJD) {
                     if (v.start < end) {
                         v.end = end
                     }
+                    return true
+                }
+                if (v.start < endJD) {
+                    v.end = endJD
                     return true
                 }
                 return false
