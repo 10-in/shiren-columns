@@ -203,7 +203,7 @@ export class Builder {
         return si.map((v, index) => {
             let d = {
                 start: v.jd,
-                end: v.nextjd - 1, // 去掉最后一天
+                end: v.nextjd,
                 // range: datetime2string(julian2solar(v.jd)) + "~" + datetime2string(julian2solar(v.nextjd)),
                 g: g,
                 z: z,
