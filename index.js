@@ -339,10 +339,10 @@ export class Cutter {
             })
         }
 
-        months.forEach((v) => {
-            v.range = datetime2string(julian2solar(v.start)) + "~" + datetime2string(julian2solar(v.end))
-            return v
-        })
+        // months.forEach((v) => {
+        //     v.range = datetime2string(julian2solar(v.start)) + "~" + datetime2string(julian2solar(v.end))
+        //     return v
+        // })
 
         return months
     }
