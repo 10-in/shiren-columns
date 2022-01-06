@@ -282,7 +282,7 @@ export class Cutter {
         const spr = spring(start[0])
         if (solar2julian(...start) < spr) { // 当前开始时间在当年春分点之前，需要往前多显示一年
             const s = julian2solar(spr)
-            if (!(s[0] === start[0] && s[1] === start[1])) { // 和立春不是同一天
+            if (!(s[0] === start[0] && s[1] === start[1] && s[2] === start[2])) { // 和立春不是同一天
                 sy -= 1
                 if (sy === 0) { // 公元0年不存在，向前偏移到公元前1年
                     sy = -1
