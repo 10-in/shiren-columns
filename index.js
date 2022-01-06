@@ -310,7 +310,7 @@ export class Cutter {
      */
     static month(months, start, end) {
         const startJD = solar2julian(...start)
-        const endJD = solar2julian(...end)
+        const endJD = solar2julian(...end) + 0.0000157
         const interval = [months[0].start, months[months.length - 1].end]
 
         if (interval[0] < startJD && startJD < interval[1]) { // 开始时间在今年
@@ -338,6 +338,12 @@ export class Cutter {
                 return false
             })
         }
+
+        months.forEach((v) => {
+            v.range = datetime2string(julian2solar(v.start)) + "~" + datetime2string(julian2solar(v.end))
+            return v
+        })
+
         return months
     }
 }
