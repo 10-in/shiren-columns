@@ -204,7 +204,7 @@ export class Builder {
             let d = {
                 start: v.jd,
                 end: v.nextjd - 1,
-                // range: datetime2string(julian2solar(v.jd)) + "~" + datetime2string(julian2solar(v.nextjd - 1)),
+                range: datetime2string(julian2solar(v.jd)) + "~" + datetime2string(julian2solar(v.nextjd - 1)),
                 g: g,
                 z: z,
                 tip: v.month + '月' + SolarIterm[index],
@@ -222,8 +222,9 @@ export class Builder {
      * @returns {*[]}
      */
     static day(month) {
-        let startJD = Math.floor(month.start) - 0.5
+        let startJD = solar2julian(...julian2solar(month.start).slice(0,3), 0,0,1)
         const columns = []
+        console.log(datetime2string(julian2solar(startJD)))
 
         const firstDay = julian2solar(startJD)
         const gzd = gzi(firstDay[0], firstDay[1], firstDay[2], 0)
