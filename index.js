@@ -202,14 +202,14 @@ export class Builder {
         let z = 2
         return si.map((v, index) => {
             let d = {
-                jd: v.jd,
+                start: v.jd,
+                end: v.nextjd - 1, // 去掉最后一天
+                // range: datetime2string(julian2solar(v.jd)) + "~" + datetime2string(julian2solar(v.nextjd)),
                 g: g,
                 z: z,
                 tip: v.month + '月' + SolarIterm[index],
                 month: v.month,
                 day: v.day,
-                dm: v.dm,
-                dd: v.dd
             }
             g = nextG(g)
             z = nextZ(z)
@@ -219,65 +219,30 @@ export class Builder {
 
     /**
      * 流日(点击流月需要展开的数据)
-     * @param year 年
-     * @param month 月份
-     * @param startDay 月份对应的12节气的开始日期
-     * @param distanceMonth 起止日期对应的月份
-     * @param delimiterDay 下一个月份对应的12节气开始日期
+     * @param month 月份信息
      * @returns {*[]}
      */
-    static day(year, month, startDay, distanceMonth, delimiterDay) {
-        const gzd = gzi(year, month, startDay, 0)
+    static day(month) {
+        let startJD = month.start
+        const columns = []
+
+        const firstDay = julian2solar(startJD)
+        const gzd = gzi(firstDay[0], firstDay[1], firstDay[2], 0)
         let dayG = gzd.g[2]
         let dayZ = gzd.z[2]
         let hourG = gzd.g[3]
 
-        const columns = []
-        if (distanceMonth > 0) { // 节气跨月了(跨了1个和2个)
-
-            // 计算当前月(月头节气到月尾)
-            let dayN = solarMonthHasDays(year, month)
-            Builder.buildColumns(columns, month, startDay, dayN + 1, dayG, dayZ, hourG)
-
-            let last = columns[columns.length - 1]
-            dayG = nextG(last.g)
-            dayZ = nextZ(last.z)
-            hourG = nextG(last.hourG)
-
-            if (distanceMonth > 1) { // 计算中间月，如节气在一三月，需要而外计算二月份
-                startDay = 1
-                if (month === 12) {
-                    year++
-                    month = 1
-                } else {
-                    month++
-                }
-                let dayNM = solarMonthHasDays(year, month)
-
-                Builder.buildColumns(columns, month, startDay, dayNM + 1, dayG, dayZ, hourG)
-            }
-
-            // 计算最后一个月(月头一日到月尾)
-            startDay = 1
-            month = month % 12 + 1
-            Builder.buildColumns(columns, month, startDay, delimiterDay, dayG, dayZ, hourG)
-
-        } else {
-            Builder.buildColumns(columns, month, startDay, delimiterDay, dayG, dayZ, hourG)
-        }
-        return columns
-    }
-
-    // 私有方法
-    static buildColumns(columns, month, startDay, endDay, dayG, dayZ, hourG) {
-        while (startDay < endDay) {
-            columns.push({tips: month + '月' + startDay + '日', g: dayG, z: dayZ, hourG: hourG})
+        while (startJD < month.end) {
+            columns.push({date: julian2solar(startJD).slice(0, 3), g: dayG, z: dayZ, hourG: hourG})
             dayG = nextG(dayG)
             dayZ = nextZ(dayZ)
             hourG = (hourG + 12) % 10
-            startDay++
+            startJD += 1
         }
+
+        return columns
     }
+
 
     /**
      * 起始的子时对应的时干
@@ -337,40 +302,42 @@ export class Cutter {
         return [sy, ey - sy + 1]
     }
 
-    static month(year, months, start, end) {
+    /**
+     * 使用时间范围对months进行切割
+     * @param months 月份配置
+     * @param start 开始日期
+     * @param end 结束日期
+     * @returns {*}
+     */
+    static month(months, start, end) {
         const startJD = solar2julian(...start)
         const endJD = solar2julian(...end)
-        const interval = [spring(year), spring(year + 1)];
+        const interval = [months[0].start, months[months.length - 1].end]
 
         if (interval[0] < startJD && startJD < interval[1]) { // 开始时间在今年
-            let i = 0
-            for (; i < months.length; i++) {
-                if (months[i].jd > startJD) {
-                    break
+            months = months.filter((v) => {
+                if (v.end < startJD) {
+                    return false
                 }
-            }
-            i === months.length && (i = months.length - 1) // 偏移过度，矫正回来
-            months = months.slice(i) // 切割月份
-
-            months[0].dm = months[0].dm - (start[1] - months[0].month)
-            months[0].day = start[2]
-            months[0].month = start[1]
+                if (v.start < startJD) {
+                    v.start = startJD
+                    return true
+                }
+                return true
+            })
         }
 
+
         if (interval[0] < endJD && endJD < interval[1]) { // 结束时间在今年
-            let j = 0
-            for (; j < months.length; j++) {
-                if (months[j].jd > endJD) {
-                    break
+            months = months.filter((v) => {
+                if (v.end < endJD) {
+                    if (v.start < end) {
+                        v.end = end
+                    }
+                    return true
                 }
-            }
-            months = months.slice(0, j)
-            const delimiterDay = julian2solar(solar2julian(...end) + 1)
-            const li = months.length - 1
-
-            months[li].dm = delimiterDay[1] - months[li].month
-            months[li].dd = delimiterDay[2]
-
+                return false
+            })
         }
         return months
     }
