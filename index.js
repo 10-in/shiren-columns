@@ -224,7 +224,6 @@ export class Builder {
     static day(month) {
         let startJD = solar2julian(...julian2solar(month.start).slice(0,3), 0,0,1)
         const columns = []
-        console.log(datetime2string(julian2solar(startJD)))
 
         const firstDay = julian2solar(startJD)
         const gzd = gzi(firstDay[0], firstDay[1], firstDay[2], 0)
