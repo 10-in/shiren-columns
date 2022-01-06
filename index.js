@@ -209,7 +209,6 @@ export class Builder {
                 z: z,
                 tip: v.month + '月' + SolarIterm[index],
                 month: v.month,
-                day: v.day,
             }
             g = nextG(g)
             z = nextZ(z)
